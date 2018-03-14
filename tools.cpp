@@ -14,15 +14,17 @@ VectorXd Tools::CalculateRMSE(const vector<VectorXd> &estimations,
 ///	TODO: Calculate the RMSE here.
 
 	int eSize=estimations.size(),gSize=ground_truth.size();
-	VectorXd rmse(gSize);
+    printf("%d\n",eSize);	
+	VectorXd rmse(4); //x,y,x',y'
 	rmse << 0,0,0,0;
 
-    // TODO: YOUR CODE HERE
+	// TODO: YOUR CODE HERE
 
 	// check the validity of the following inputs:
 	//  * the estimation vector size should not be zero
 	//  * the estimation vector size should equal ground truth vector size
 	// ... your code here
+	
 	if((eSize != gSize )|| eSize == 0){
 		cout << "Invalid estimation or ground_truth data" << endl;
 		return rmse;
@@ -48,6 +50,7 @@ VectorXd Tools::CalculateRMSE(const vector<VectorXd> &estimations,
 
 	//return the result
 	return rmse;
+
 }
 
 MatrixXd Tools::CalculateJacobian(const VectorXd& x_state) {

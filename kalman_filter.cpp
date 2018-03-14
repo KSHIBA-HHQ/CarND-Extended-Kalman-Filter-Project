@@ -37,7 +37,7 @@ void KalmanFilter::Update(const VectorXd &z) {
 
 	VectorXd y=z-(H_*x_);
 	
-/////////////////////////////////////////	
+///////yを適用してUpdate////////////////////////////////////////////////////////////////////
 	MatrixXd S=H_*P_*H_.transpose()+R_;
 
 	MatrixXd K=P_*H_.transpose()*S.inverse();
@@ -56,12 +56,13 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
 	double rho = sqrt(x_(0)*x_(0) + x_(1)*x_(1));
 	double theta = atan(x_(1) / x_(0));
 	double rho_dot = (x_(0)*x_(2) + x_(1)*x_(3)) / rho;
+	
 	VectorXd h = VectorXd(3); // h(x_)
 	h << rho, theta, rho_dot;
 	
 	VectorXd y = z - h;
 	
-/////////////////////////////////////////	
+///////yを適用してUpdate////////////////////////////////////////////////////////////////////
 	MatrixXd S=H_*P_*H_.transpose()+R_;
 
 	MatrixXd K=P_*H_.transpose()*S.inverse();
