@@ -58,19 +58,19 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
     //  >> Remember: you'll need to convert radar from polar to cartesian coordinates.
    
 	
-	ekf_.P_ = MatrixXd(4, 4);
-    ekf_.P_ << 1, 0, 0,    0,
-			   0, 1, 0,    0,
-			   0, 0, 1000, 0,
-			   0, 0, 0, 1000;
+	MatrixXd P (4, 4);
+    P  <<  1, 0, 0,    0,
+		   0, 1, 0,    0,
+		   0, 0, 1000, 0,
+		   0, 0, 0, 1000;
 			   
 			   
     // first measurement
     cout << "EKF: " << endl;
 	
-    ekf_.x_ = VectorXd(4);
-    ///ekf_.x_ << 1, 1, 1, 1; ///default
-
+	VectorXd x(4);
+	MatrixXd H,R;
+			
     if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
       
 		//Convert radar from polar to cartesian coordinates and initialize state.
@@ -78,25 +78,53 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
 		float phi = measurement_pack.raw_measurements_[1]; 		// bearing
 		float rho_dot = measurement_pack.raw_measurements_[2]; 	// velocity of rho
 		// Coordinates convertion from polar to cartesian
-		float x = rho * cos(phi); 
-		float y = rho * sin(phi);
+		float px = rho * cos(phi); 
+		float py = rho * sin(phi);
 		float vx = rho_dot * cos(phi);
 		float vy = rho_dot * sin(phi);
-		ekf_.x_ << x, y, vx , vy; 
-    }
+		x << px, py, vx , vy; 
+
+		H=Hj_ = tools.CalculateJacobian(ekf_.x_);
+		R=R_radar_;	
+
+	}
     else if (measurement_pack.sensor_type_ == MeasurementPackage::LASER) {
       
 		//Initialize state.
-		ekf_.x_ << measurement_pack.raw_measurements_[0], measurement_pack.raw_measurements_[1], 0, 0;
-    }
+		x << measurement_pack.raw_measurements_[0], measurement_pack.raw_measurements_[1], 0, 0;
+		H=H_laser_;
+		R=R_laser_;
 
-			   
+
+	}	   
    
+	MatrixXd F(4, 4);
+	F << 	1, 0, 0, 0,
+			0, 1, 0, 0,
+			0, 0, 1, 0,
+			0, 0, 0, 1;
+
+	MatrixXd Q(4,4);
+	Q << 	0, 0, 0, 0,
+			0, 0, 0, 0,
+			0, 0, 0, 0,
+			0, 0, 0, 0;
+
+
+	ekf_.Init(	x, 	/*x_in*/ 
+				P, 	/*P_in*/ 
+				F, 	/*F_in*/
+				H, 	/*H_in*/ 
+				R, 	/*R_in*/  
+				Q );/*Q_in*/
+
+	
     // rec initial timestamp for next dt calculation
     previous_timestamp_ = measurement_pack.timestamp_;
 	
 	
-    // done initializing, no need to predict or update
+    // done initializing, no need to predict or update	
+		
     is_initialized_ = true;
     return;
   }
