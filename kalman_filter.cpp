@@ -27,7 +27,7 @@ void KalmanFilter::Predict() {
 	//u << 0, 0, 0, 0;
 	//x_=(F_*x_)+u; 	P_=F_*P_*_F.transpose();
 	//代わりに誤差行列Qを用いる
-	
+	x_=(F_*x_);
 	P_=F_*P_*(F_.transpose())+Q_;
 		
 }

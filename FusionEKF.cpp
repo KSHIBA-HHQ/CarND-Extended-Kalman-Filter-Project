@@ -10,7 +10,10 @@ using std::vector;
 
 // Constructor.
 FusionEKF::FusionEKF() {
-	
+  reset_item();
+}
+
+void FusionEKF::reset_item(){  
   is_initialized_ = false;
 
   previous_timestamp_ = 0;

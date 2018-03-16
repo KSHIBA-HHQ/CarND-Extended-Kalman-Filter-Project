@@ -90,6 +90,18 @@ int main()
           		iss >> timestamp;
           		meas_package.timestamp_ = timestamp;
           }
+		  
+		  #if 1
+			  static long long originstamp=-1;
+			  if(originstamp<0)originstamp=timestamp;
+			  if(timestamp==originstamp){
+				  vector<VectorXd> swap[2];
+				  estimations=swap[0];
+				  ground_truth=swap[1];
+				  fusionEKF. reset_item();
+			  }
+		  #endif
+		  
           float x_gt;
     	  float y_gt;
     	  float vx_gt;
